@@ -25,19 +25,21 @@
 module fir_tb;
 
 	// Inputs
+	reg rst_n;
 	reg clk;
 	reg [11:0] data_in;
 	wire [11:0] data_out;
-	reg [23:0] coeff;
+	reg [31:0] coeff;
 
 	// Instantiate the Unit Under Test (UUT)
 	fir 
 	# (.DATA_WIDTH(16),
-		.COEFF_WIDTH(7),
+		.COEFF_WIDTH(8),
 		.NUM_TAPS(4))
 		uut 
 	(
-		.clk(src_clk), 
+		.rst_n(rst_n),
+		.clk(clk), 
 		.data_in(data_in), 
 		.data_out(data_out), 
 		.coeff(coeff)
@@ -45,13 +47,15 @@ module fir_tb;
 
 	initial begin
 		// Initialize Inputs
+		rst_n = 0;
 		clk = 0;
 		data_in = 0;
-		coeff = { 4, 3, -1, -2 };
+		coeff = { 8'd4, 8'd3, -8'd1, -8'd2 };
 		
 		// Wait 100 ns for global reset to finish
-		#100;
-        
+		#20;
+      rst_n = 1;
+		  
 		// Add stimulus here
 		data_in = 0;  #40;
       data_in = -3; #10;
@@ -63,6 +67,8 @@ module fir_tb;
       data_in = -5; #10;
       data_in = 6;  #10;
       data_in = 0;  #10;
+		
+		$finish;
 	end
       
 	always #5 clk = ~clk;
