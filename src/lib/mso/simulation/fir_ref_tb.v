@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module fir_tb;
+module fir_ref_tb;
 
 	// Inputs
 	reg rst_n;
@@ -32,7 +32,7 @@ module fir_tb;
 	reg [31:0] packed_coeffs;
 
 	// Instantiate the Unit Under Test (UUT)
-	fir 
+	fir_ref
 	# (.DATA_WIDTH(16),
 		.COEFF_WIDTH(8),
 		.NUM_TAPS(4))
@@ -42,7 +42,7 @@ module fir_tb;
 		.clk(clk), 
 		.data_in(data_in), 
 		.data_out(data_out), 
-		.packed_coeffs(packed_coeffs)
+		.packed_coeff(packed_coeffs)
 	);
 
 	initial begin

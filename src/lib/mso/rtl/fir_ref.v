@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Compandata_out: 
+// Company: 
 // Engineer: 1
 // 
 // Create Date:    14:55:50 12/13/2020 
@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module fir
+module fir_ref
 #(
 	parameter DATA_WIDTH = 8,
 	parameter COEFF_WIDTH = 8,
@@ -28,13 +28,12 @@ module fir
 	 input rst_n,
     input clk,
     input signed [DATA_WIDTH-1:0] data_in,
-    input [(COEFF_WIDTH*NUM_TAPS)-1:0] packed_coeffs,
-    output reg [DATA_WIDTH-1:0] data_out
+    input [(COEFF_WIDTH*NUM_TAPS)-1:0] packed_coeff,
+    output [DATA_WIDTH-1:0] data_out
     );
 
-	reg signed[DATA_WIDTH-1:0] Q [1:NUM_TAPS-1];
-	wire signed [DATA_WIDTH-1:0] MCM [0:NUM_TAPS-1];
-	wire signed [DATA_WIDTH-1:0] ADD_OUT [1:NUM_TAPS-1];
+	reg signed[DATA_WIDTH-1:0] x [0:NUM_TAPS-1];
+	wire signed[DATA_WIDTH-1:0] m [0:NUM_TAPS-1];
 	wire signed [COEFF_WIDTH-1:0] h [0:NUM_TAPS-1];
 	
 	genvar i;
@@ -42,25 +41,28 @@ module fir
 	genvar a_lsb;
 	generate
 		for (i = 0; i < NUM_TAPS ; i = i + 1) begin : for_taps
-			assign h[i] = packed_coeffs[((COEFF_WIDTH*i)+COEFF_WIDTH)-1:COEFF_WIDTH*i];
-			assign MCM[i] = h[i] * data_in;
-			if (i != 0) begin : no_first
-				assign ADD_OUT[i] = Q[i] + MCM[(NUM_TAPS-1)-i];
+			assign h[i] = packed_coeff[((COEFF_WIDTH*i)+COEFF_WIDTH)-1:COEFF_WIDTH*i];
+			if (i == 0) begin : no_first
+				assign m[i] = x[i] * h[i];
+			end else begin
+				assign m[i] = m[i-1] + (x[i] * h[i]);
 			end
 		end
 	endgenerate
 	
+	assign data_out = m[NUM_TAPS-1];
+	
+	integer ti;
 	always @(posedge clk or rst_n) begin
 		if (!rst_n) begin
-			Q[1] <= 0;
-			Q[2] <= 0;
-			Q[3] <= 0;
-			data_out <= 0;
+			for (ti = 0; ti < NUM_TAPS ; ti = ti + 1) begin : reset_taps
+				x[ti] <= 0;
+			end
 		end else begin
-			Q[1] <= MCM[3];
-			Q[2] <= ADD_OUT[1];
-			Q[3] <= ADD_OUT[2];
-			data_out <= ADD_OUT[3];
+			x[0] <= data_in;
+			for (ti = 1; ti < NUM_TAPS ; ti = ti + 1) begin : cascade_taps
+				x[ti] <= x[ti-1];
+			end
 		end
 	end
 	

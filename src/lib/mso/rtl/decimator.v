@@ -26,10 +26,9 @@ module decimator#(
 )
 (
     input src_clk,
-    input [11:0] src_data,
-    input dst_clk,
-	 input [COEFF_WIDTH:0] coeff [0:NUM_TAPS-1],
-    output reg [11:0] dest_data
+    input [11:0] x,
+    output dst_clk,
+	 output reg [11:0] y
     );
 
 	reg [SRC_DATA_WIDTH-1:0] Q [1:NUM_TAPS-1];
@@ -39,7 +38,7 @@ module decimator#(
 	genvar i;
 	generate
 		for (i = 0; i < 3 ; i = i + 1) begin
-			assign MCM[i] = coeff[i]*src_data;
+			assign MCM[i] = coeff[i]*x;
 			if (i != 0)
 				assign ADD_OUT[i] = Q[i] + MCM[(NUM_TAPS-1)-i];
 		end
@@ -52,7 +51,7 @@ module decimator#(
 	end
 	
 	always @(posedge dest_clk) begin
-		dest_data <= ADD_OUT[3][SRC_DATA_WIDTH:SRC_DATA_WIDTH-DEST_DATA_WIDTH];
+		y <= ADD_OUT[3][SRC_DATA_WIDTH:SRC_DATA_WIDTH-DEST_DATA_WIDTH];
 	end
 
 endmodule
