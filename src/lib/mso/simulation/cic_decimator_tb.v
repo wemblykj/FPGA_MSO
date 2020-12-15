@@ -28,20 +28,27 @@ module cic_decimator_tb;
 	reg rst_n;
 	reg clk;
 	reg enabled;
-	reg [11:0] data_in;
+	reg signed [11:0] x;
 
 	// Outputs
 	wire clk_transfer;
-	wire [15:0] data_out;
+	wire signed [15:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
-	cic_decimator uut (
-		.rst_n(rst_n), 
-		.clk(clk), 
-		.enabled(enabled), 
-		.data_in(data_in), 
-		.clk_transfer(clk_transfer), 
-		.data_out(data_out)
+	cic_decimator
+		#(
+			.M(1),
+			.D(5),
+			.R(1)
+		)
+		uut
+		(
+			.rst_n(rst_n), 
+			.clk(clk), 
+			.enabled(enabled), 
+			.x(x), 
+			.clk_transfer(clk_transfer), 
+			.y(y)
 	);
 
 	initial begin
@@ -49,24 +56,20 @@ module cic_decimator_tb;
 		rst_n = 0;
 		clk = 0;
 		enabled = 0;
-		data_in = 0;
+		x = 0;
 
 		// Wait 100 ns for global reset to finish
 		#100;
       rst_n = 1;
 		
 		// Add stimulus here
-		enabled = 1;
-		data_in = 0;  #40;
-      data_in = -3; #10;
-      data_in = 1;  #10;
-      data_in = 0;  #10;
-      data_in = -2; #10;
-      data_in = -1; #10;
-      data_in = 4;  #10;
-      data_in = -5; #10;
-      data_in = 6;  #10;
-      data_in = 0;  #10;
+		enabled = 1;	#10
+		
+		x = 1000;  #10;
+		x = 0;  #10;
+		#100;
+		
+		$finish;
 	end
       
 	always #5 clk = ~clk;

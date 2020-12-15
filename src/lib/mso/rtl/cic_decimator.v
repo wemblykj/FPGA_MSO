@@ -31,82 +31,80 @@ module cic_decimator
 		input rst_n,
 		input clk,
 		input enabled,
-		input signed [INPUT_WIDTH-1:0] data_in,
+		input signed [INPUT_WIDTH-1:0] x,
 		output reg clk_transfer,
-		output [OUTPUT_WIDTH-1:0] data_out
+		output [OUTPUT_WIDTH-1:0] y
 	);
 
+	reg [$clog2(R+1):0] decimation_counter;
 	reg substage_clk;
-	
-	assign data_out = comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
 	
 	always @(posedge clk or rst_n) begin
 		if (!rst_n) begin
-			counter = 0;
+			decimation_counter = 0;
 			substage_clk = 0;
 		end else if (enabled) begin
-			if (counter < R) begin	
-				substage_clk <= 1;
-				counter <= counter + 1;
+			if (decimation_counter < R) begin	
+				substage_clk <= 0;
+				decimation_counter <= decimation_counter + 1;
 			end else begin
 				substage_clk <= 1;
-				counter <= 0;
+				decimation_counter <= 0;
 			end
 		end
 	end
 	
-	wire [ACC_WIDTH-1:0] integrater1_out;
+	wire [ACC_WIDTH-1:0] integrator_in [0:M-1];
+	wire [ACC_WIDTH-1:0] integrator_out [0:M-1];
+	wire [ACC_WIDTH-1:0] comb_in [0:M-1];
+	wire [ACC_WIDTH-1:0] comb_out [0:M-1];
 	
-	cic_integrator 
-	#(
-		.DATA_WIDTH(ACC_WIDTH)
-	)
-	integrator1 (
-		.rst_n(rst_n), 
-		.clk(clk),
-		.x(data_in),
-		.y(integrater1_out)
-	);
+	assign integrator_in[0] = {{(ACC_WIDTH-INPUT_WIDTH){x[INPUT_WIDTH-1]}}, x[INPUT_WIDTH-1:0] };
+	assign y = comb_out[M-1][ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];	
 	
-	wire [ACC_WIDTH-1:0] integrater2_out;
+	genvar i;
+	generate
+		for (i = 0; i < M; i = i + 1) begin : integrator_stage
+			cic_integrator 
+			#(
+				.DATA_WIDTH(ACC_WIDTH)
+			)
+			inst
+			(
+				.rst_n(rst_n), 
+				.clk(clk),
+				.x(integrator_in[i]),
+				.y(integrator_out[i])
+			);
+			
+			if (i !== 0) begin : integrator_stage_interconnects
+				assign integrator_in[i] = integrator_out[i-1];
+			end
+				
+		end
+		
+		for (i = 0; i < M; i = i + 1) begin : comb_stage
+			cic_comb
+			#(
+				.D(D),
+				.DATA_WIDTH(ACC_WIDTH)
+			)
+			inst
+			(
+				.rst_n(rst_n), 
+				.clk(substage_clk),
+				.x(comb_in[i]),
+				.y(comb_out[i])
+			);
+			
+			if (i === 0) begin : comb_stage_input
+				assign comb_in[i] = integrator_out[M-1];
+			end else begin : comb_stage_interconnects
+				assign comb_in[i] = comb_out[i-1];
+			end
+		end
+	endgenerate
 	
-	cic_integrator 
-	#(
-		.DATA_WIDTH(ACC_WIDTH)
-	)
-	integrator2 (
-		.rst_n(rst_n), 
-		.clk(clk),
-		.x(integrater1_out),
-		.y(integrater2_out)
-	);
-	
-	wire [ACC_WIDTH-1:0] comb1_out;
-	
-	cic_comb
-	#(
-		.DATA_WIDTH(ACC_WIDTH)
-	)
-	comb1 (
-		.rst_n(rst_n), 
-		.clk(substage_clk),
-		.x(integrater2_out),
-		.y(comb1_out)
-	);
-	
-	wire [ACC_WIDTH-1:0] comb2_out;
-	
-	cic_comb
-	#(
-		.DATA_WIDTH(ACC_WIDTH)
-	)
-	comb2 (
-		.rst_n(rst_n), 
-		.clk(substage_clk),
-		.x(comb2_out),
-		.y(comb2_out)
-	);
-
 	/*
 reg [$clog2(R+1):0] counter;
 reg [INPUT_WIDTH-1:0] input_register;
@@ -144,9 +142,9 @@ always @(posedge clk or rst_n) begin
 		comb2_delay <= 0;
 		comb2_diff <= 0;
 		
-		data_out <= 0;
+		y <= 0;
 	end else if (enabled) begin
-		input_register <= data_in;
+		input_register <= x;
 		
 		integrator1_out <= integrator1_sum;
 		integrator2_out <= integrator2_sum;
@@ -162,7 +160,7 @@ always @(posedge clk or rst_n) begin
 			comb2_delay <= comb2_in;
 			comb2_out <= comb2_sub;
 			
-			data_out <= comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
+			y <= comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
 			clk_transfer <= 1;
 		end else
 			clk_transfer <= 0;

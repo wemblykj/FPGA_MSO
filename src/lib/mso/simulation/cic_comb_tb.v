@@ -27,13 +27,17 @@ module cic_comb_tb;
 	// Inputs
 	reg rst_n;
 	reg clk;
-	reg [11:0] x;
+	reg signed [11:0] x;
 
 	// Outputs
-	wire [11:0] y;
+	wire signed [11:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
-	cic_comb uut (
+	cic_comb 
+	#(
+		.D(5)
+	)
+	uut (
 		.rst_n(rst_n), 
 		.clk(clk), 
 		.x(x), 
@@ -48,10 +52,17 @@ module cic_comb_tb;
 
 		// Wait 100 ns for global reset to finish
 		#100;
-        
+       rst_n = 1;
+		
 		// Add stimulus here
-
+		x = 1;  #10;
+		x = 0;  #10;
+		#100;
+		
+		$finish;
 	end
+      
+	always #5 clk = ~clk;
       
 endmodule
 

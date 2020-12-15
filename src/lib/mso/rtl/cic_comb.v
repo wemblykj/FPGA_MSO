@@ -26,21 +26,21 @@ module cic_comb
 	(
 		input rst_n,
 		input clk,
-		input [DATA_WIDTH-1:0] x,
-		output [DATA_WIDTH-1:0] y
+		input signed [DATA_WIDTH-1:0] x,
+		output signed [DATA_WIDTH-1:0] y
     );
 
-	reg [DATA_WIDTH-1:0] z[0:D];
+	reg signed [DATA_WIDTH-1:0] z[0:D-1];
 	
-	genvar i;
+	integer i;
 	
-	always @(posedge clk) begin
+	always @(posedge clk or rst_n) begin
 		if (!rst_n) begin
 			for (i = 0; i < D; i = i + 1) begin
 				z[i] <= 0;
 			end
 		end else begin
-			z[0] <= data_in - z[D-1];
+			z[0] <= x - z[D-1];
 			for (i = 1; i < D; i = i + 1) begin
 				z[i] <= z[i-1];
 			end

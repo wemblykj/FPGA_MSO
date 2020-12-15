@@ -48,10 +48,17 @@ module cic_integrator_tb;
 
 		// Wait 100 ns for global reset to finish
 		#100;
-        
+      rst_n = 1;
+		
 		// Add stimulus here
-
+		x = 1;  #10;
+		x = 0;  #10;
+		#100;
+		
+		$finish;
 	end
+      
+	always #5 clk = ~clk;
       
 endmodule
 
