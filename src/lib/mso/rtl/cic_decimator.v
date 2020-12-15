@@ -18,7 +18,8 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module cic_decimator#(
+module cic_decimator
+	#(
 		parameter R = 6,	// decimation factor
 		parameter D = 1,	// delay line length - currently implementation is hardcoded to 1
 		parameter M = 2,	// multistage order - currently implementation is hardcoded to 2
@@ -32,9 +33,81 @@ module cic_decimator#(
 		input enabled,
 		input signed [INPUT_WIDTH-1:0] data_in,
 		output reg clk_transfer,
-		output reg [OUTPUT_WIDTH-1:0] data_out
+		output [OUTPUT_WIDTH-1:0] data_out
 	);
 
+	reg substage_clk;
+	
+	assign data_out = comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
+	
+	always @(posedge clk or rst_n) begin
+		if (!rst_n) begin
+			counter = 0;
+			substage_clk = 0;
+		end else if (enabled) begin
+			if (counter < R) begin	
+				substage_clk <= 1;
+				counter <= counter + 1;
+			end else begin
+				substage_clk <= 1;
+				counter <= 0;
+			end
+		end
+	end
+	
+	wire [ACC_WIDTH-1:0] integrater1_out;
+	
+	cic_integrator 
+	#(
+		.DATA_WIDTH(ACC_WIDTH)
+	)
+	integrator1 (
+		.rst_n(rst_n), 
+		.clk(clk),
+		.x(data_in),
+		.y(integrater1_out)
+	);
+	
+	wire [ACC_WIDTH-1:0] integrater2_out;
+	
+	cic_integrator 
+	#(
+		.DATA_WIDTH(ACC_WIDTH)
+	)
+	integrator2 (
+		.rst_n(rst_n), 
+		.clk(clk),
+		.x(integrater1_out),
+		.y(integrater2_out)
+	);
+	
+	wire [ACC_WIDTH-1:0] comb1_out;
+	
+	cic_comb
+	#(
+		.DATA_WIDTH(ACC_WIDTH)
+	)
+	comb1 (
+		.rst_n(rst_n), 
+		.clk(substage_clk),
+		.x(integrater2_out),
+		.y(comb1_out)
+	);
+	
+	wire [ACC_WIDTH-1:0] comb2_out;
+	
+	cic_comb
+	#(
+		.DATA_WIDTH(ACC_WIDTH)
+	)
+	comb2 (
+		.rst_n(rst_n), 
+		.clk(substage_clk),
+		.x(comb2_out),
+		.y(comb2_out)
+	);
+
+	/*
 reg [$clog2(R+1):0] counter;
 reg [INPUT_WIDTH-1:0] input_register;
 
@@ -83,16 +156,18 @@ always @(posedge clk or rst_n) begin
 		if (counter === 1) begin
 			comb1_diff <= comb1_delay;
 			comb1_delay <= comb1_in;
+			comb1_out <= comb1_sub;
 			
 			comb2_diff <= comb2_delay;
 			comb2_delay <= comb2_in;
+			comb2_out <= comb2_sub;
 			
 			data_out <= comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
 			clk_transfer <= 1;
 		end else
 			clk_transfer <= 0;
 		
-		if (counter <= R)
+		if (counter < R)
 			counter <= counter + 1;
 		else
 			counter <= 0;
@@ -106,9 +181,9 @@ assign integrator2_in = integrator1_out;
 assign integrator2_sum = integrator2_out + integrator2_in;
 
 assign comb1_in = integrator2_out;
-assign comb1_sub = comb1_in + comb1_diff;
+assign comb1_sub = comb1_in - comb1_diff;
 
 assign comb2_in = comb1_out;
-assign comb2_sub = comb2_in + comb2_diff;
-
+assign comb2_sub = comb2_in - comb2_diff;
+*/
 endmodule
