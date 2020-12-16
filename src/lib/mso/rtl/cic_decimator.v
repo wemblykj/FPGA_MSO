@@ -20,20 +20,22 @@
 //////////////////////////////////////////////////////////////////////////////////
 module cic_decimator
 	#(
-		parameter R = 6,	// decimation factor
+		// characteristics
+		parameter R = 2,	// decimation factor - default 2 (factor of 2)
 		parameter D = 1,	// delay line length - currently implementation is hardcoded to 1
 		parameter M = 2,	// multistage order - currently implementation is hardcoded to 2
-		parameter INPUT_WIDTH = 12,
-		parameter OUTPUT_WIDTH = 16,
-		parameter ACC_WIDTH = 24
+		// precision
+		parameter X_WIDTH = 12,
+		parameter Y_WIDTH = X_WIDTH,
+		parameter PRECISION = Y_WIDTH
 	)
 	(
 		input rst_n,
 		input clk,
 		input enabled,
-		input signed [INPUT_WIDTH-1:0] x,
+		input signed [X_WIDTH-1:0] x,
 		output reg clk_transfer,
-		output [OUTPUT_WIDTH-1:0] y
+		output [Y_WIDTH-1:0] y
 	);
 
 	reg [$clog2(R+1):0] decimation_counter;
@@ -54,20 +56,32 @@ module cic_decimator
 		end
 	end
 	
-	wire [ACC_WIDTH-1:0] integrator_in [0:M-1];
-	wire [ACC_WIDTH-1:0] integrator_out [0:M-1];
-	wire [ACC_WIDTH-1:0] comb_in [0:M-1];
-	wire [ACC_WIDTH-1:0] comb_out [0:M-1];
-	
-	assign integrator_in[0] = {{(ACC_WIDTH-INPUT_WIDTH){x[INPUT_WIDTH-1]}}, x[INPUT_WIDTH-1:0] };
-	assign y = comb_out[M-1][ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];	
+	wire [PRECISION-1:0] integrator_in [0:M-1];
+	wire [PRECISION-1:0] integrator_out [0:M-1];
+	wire [PRECISION-1:0] comb_in [0:M-1];
+	wire [PRECISION-1:0] comb_out [0:M-1];
 	
 	genvar i;
 	generate
+		// input conditioning
+		if (X_WIDTH > PRECISION) begin : trim_input
+			assign integrator_in[0] = x[X_WIDTH-1:X_WIDTH-PRECISION];
+		end else begin : pad_input
+			assign integrator_in[0] = {x[X_WIDTH-1:0], {(PRECISION-X_WIDTH){1'b0}}};
+		end
+		
+		// output conditioning
+		if (PRECISION > Y_WIDTH) begin : trim_output
+			assign y = comb_out[M-1][PRECISION-1:PRECISION-Y_WIDTH];	
+		end else begin : pad_output
+			assign y = {comb_out[M-1], {(Y_WIDTH-PRECISION){1'b0}}};	
+		end
+	
+		// generate M integrator stages
 		for (i = 0; i < M; i = i + 1) begin : integrator_stage
 			cic_integrator 
 			#(
-				.DATA_WIDTH(ACC_WIDTH)
+				.PRECISION(PRECISION)
 			)
 			inst
 			(
@@ -83,11 +97,12 @@ module cic_decimator
 				
 		end
 		
+		// generate M comb [sub]stages
 		for (i = 0; i < M; i = i + 1) begin : comb_stage
 			cic_comb
 			#(
 				.D(D),
-				.DATA_WIDTH(ACC_WIDTH)
+				.PRECISION(PRECISION)
 			)
 			inst
 			(
@@ -105,83 +120,4 @@ module cic_decimator
 		end
 	endgenerate
 	
-	/*
-reg [$clog2(R+1):0] counter;
-reg [INPUT_WIDTH-1:0] input_register;
-
-wire [ACC_WIDTH-1:0] integrator1_in;
-wire [ACC_WIDTH-1:0] integrator1_sum;
-reg [ACC_WIDTH-1:0] integrator1_out;
-
-wire [ACC_WIDTH-1:0] integrator2_in;
-wire [ACC_WIDTH-1:0] integrator2_sum;
-reg [ACC_WIDTH-1:0] integrator2_out;
-
-wire [ACC_WIDTH-1:0] comb1_in;
-reg [ACC_WIDTH-1:0] comb1_diff;
-reg [ACC_WIDTH-1:0] comb1_delay;
-reg [ACC_WIDTH-1:0] comb1_out;
-
-wire [ACC_WIDTH-1:0] comb2_in;
-reg [ACC_WIDTH-1:0] comb2_diff;
-reg [ACC_WIDTH-1:0] comb2_delay;
-reg [ACC_WIDTH-1:0] comb2_out;
-
-always @(posedge clk or rst_n) begin
-	if (!rst_n) begin
-		counter = 0;
-		input_register <= 0;
-		integrator1_out <= 0;
-		integrator2_out <= 0;
-		
-		comb1_out <= 0;
-		comb1_delay <= 0;
-		comb1_diff <= 0;
-		
-		comb2_out <= 0;
-		comb2_delay <= 0;
-		comb2_diff <= 0;
-		
-		y <= 0;
-	end else if (enabled) begin
-		input_register <= x;
-		
-		integrator1_out <= integrator1_sum;
-		integrator2_out <= integrator2_sum;
-		
-		// ? perform decimation after 1 input has been processed ? 
-		// based on Googled code - this may or may not be correct
-		if (counter === 1) begin
-			comb1_diff <= comb1_delay;
-			comb1_delay <= comb1_in;
-			comb1_out <= comb1_sub;
-			
-			comb2_diff <= comb2_delay;
-			comb2_delay <= comb2_in;
-			comb2_out <= comb2_sub;
-			
-			y <= comb2_out[ACC_WIDTH-1:ACC_WIDTH-OUTPUT_WIDTH];
-			clk_transfer <= 1;
-		end else
-			clk_transfer <= 0;
-		
-		if (counter < R)
-			counter <= counter + 1;
-		else
-			counter <= 0;
-	end
-end
-
-assign integrator1_in = { {(ACC_WIDTH-INPUT_WIDTH){input_register[INPUT_WIDTH-1]}}, input_register[INPUT_WIDTH-1:0] };
-assign integrator1_sum = integrator1_out + integrator1_in;
-
-assign integrator2_in = integrator1_out;
-assign integrator2_sum = integrator2_out + integrator2_in;
-
-assign comb1_in = integrator2_out;
-assign comb1_sub = comb1_in - comb1_diff;
-
-assign comb2_in = comb1_out;
-assign comb2_sub = comb2_in - comb2_diff;
-*/
 endmodule

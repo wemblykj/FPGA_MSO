@@ -20,17 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 module cic_comb
 	#(
-		parameter D = 1,
-		parameter DATA_WIDTH = 12
+		// characteristics
+		parameter D = 1,	// feedback delay line length - default 1
+		
+		// precision
+		parameter PRECISION = 12
 	)
 	(
 		input rst_n,
 		input clk,
-		input signed [DATA_WIDTH-1:0] x,
-		output signed [DATA_WIDTH-1:0] y
+		input signed [PRECISION-1:0] x,
+		output signed [PRECISION-1:0] y
     );
 
-	reg signed [DATA_WIDTH-1:0] z[0:D-1];
+	reg signed [PRECISION-1:0] z[0:D-1];
 	
 	integer i;
 	

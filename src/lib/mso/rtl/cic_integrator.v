@@ -20,16 +20,19 @@
 //////////////////////////////////////////////////////////////////////////////////
 module cic_integrator
 	#(
-		parameter DATA_WIDTH = 12
+		// characteristics
+		
+		// precision
+		parameter PRECISION = 12
 	)
 	(
 		input rst_n,
 		input clk,
-		input [DATA_WIDTH-1:0] x,
-		output [DATA_WIDTH-1:0] y
+		input [PRECISION-1:0] x,
+		output [PRECISION-1:0] y
     );
 
-	reg [DATA_WIDTH-1:0] z;
+	reg [PRECISION-1:0] z;
 	
 	always @(posedge clk or rst_n) begin
 		if (!rst_n) begin

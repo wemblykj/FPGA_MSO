@@ -18,40 +18,45 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module decimator#(
-	SRC_DATA_WIDTH,
-	DEST_DATA_WIDTH,
-	COEFF_WIDTH = 7,
-	NUM_TAPS = 5
-)
-(
-    input src_clk,
-    input [11:0] x,
-    output dst_clk,
-	 output reg [11:0] y
-    );
-
-	reg [SRC_DATA_WIDTH-1:0] Q [1:NUM_TAPS-1];
-	wire [SRC_DATA_WIDTH-1:0] MCM [0:NUM_TAPS-1];
-	wire [SRC_DATA_WIDTH-1:0] ADD_OUT [1:NUM_TAPS-1];
+module decimator
+	#(
+		// precision
+		parameter X_WIDTH = 12,				// sensible default for a 12-bit ADC
+		parameter Y_WIDTH = 16,				// sensible default for a 16-bit sample
+		parameter PRECISION = Y_WIDTH		// sensible default for accumulating 12-bit input data
+													// when using a multistage CIC pipeline
+	)
+	(
+		input [X_WIDTH-1:0] x,
+		output [Y_WIDTH-1:0] y
+	);
 	
-	genvar i;
-	generate
-		for (i = 0; i < 3 ; i = i + 1) begin
-			assign MCM[i] = coeff[i]*x;
-			if (i != 0)
-				assign ADD_OUT[i] = Q[i] + MCM[(NUM_TAPS-1)-i];
-		end
-	endgenerate
+	wire substage_clk;
 	
-	always @(posedge src_clk) begin
-		Q1 <= MCM[3];
-		Q2 <= ADD_OUT[1];
-		Q3 <= ADD_OUT[2];
-	end
+    cic_decimator
+		#(
+			.M(1),
+			.D(5),
+			.R(1),
+			.X_WIDTH(X_WIDTH),	// test input trimming
+			.Y_WIDTH(Y_WIDTH), // test ouput padding
+			.PRECISION(PRECISION)		// test reduced precision processing
+		)
+		uut
+		(
+			.rst_n(rst_n), 
+			.clk(clk), 
+			.enabled(1), 
+			.x(x), 
+			.clk_transfer(substage_clk), 
+			.y(y)
+		);
 	
-	always @(posedge dest_clk) begin
-		y <= ADD_OUT[3][SRC_DATA_WIDTH:SRC_DATA_WIDTH-DEST_DATA_WIDTH];
-	end
-
+	/*fir
+		#()
+		compensator
+		(
+			.rst_n(rst_n), 
+			.clk(substage_clk),
+		)*/
 endmodule

@@ -19,17 +19,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module fir
-#(
-	parameter DATA_WIDTH = 8,
-	parameter COEFF_WIDTH = 8,
-	parameter NUM_TAPS = 4
-)
-(
-	 input rst_n,
-    input clk,
-    input signed [DATA_WIDTH-1:0] data_in,
-    input [(COEFF_WIDTH*NUM_TAPS)-1:0] packed_coeffs,
-    output reg [DATA_WIDTH-1:0] data_out
+	#(
+		parameter DATA_WIDTH = 8,
+		parameter COEFF_WIDTH = 8,
+		parameter NUM_TAPS = 4
+	)
+	(
+		 input rst_n,
+		 input clk,
+		 input signed [DATA_WIDTH-1:0] data_in,
+		 input [(COEFF_WIDTH*NUM_TAPS)-1:0] packed_coeffs,
+		 output reg [DATA_WIDTH-1:0] data_out
     );
 
 	reg signed[DATA_WIDTH-1:0] Q [1:NUM_TAPS-1];

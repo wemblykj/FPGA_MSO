@@ -28,18 +28,23 @@ module cic_decimator_tb;
 	reg rst_n;
 	reg clk;
 	reg enabled;
-	reg signed [11:0] x;
+	reg signed [7:0] x;
 
 	// Outputs
 	wire clk_transfer;
-	wire signed [15:0] y;
+	wire signed [7:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
 	cic_decimator
 		#(
+			// characteristics
 			.M(1),
 			.D(5),
-			.R(1)
+			.R(1),
+			// precision
+			.X_WIDTH(8),	// test input trimming
+			.Y_WIDTH(8), // test ouput padding
+			.PRECISION(3)		// test reduced precision processing
 		)
 		uut
 		(
@@ -65,7 +70,7 @@ module cic_decimator_tb;
 		// Add stimulus here
 		enabled = 1;	#10
 		
-		x = 1000;  #10;
+		x = 'h80;  #10;
 		x = 0;  #10;
 		#100;
 		
