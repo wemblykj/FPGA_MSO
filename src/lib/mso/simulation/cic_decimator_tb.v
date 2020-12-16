@@ -31,7 +31,7 @@ module cic_decimator_tb;
 	reg signed [7:0] x;
 
 	// Outputs
-	wire clk_transfer;
+	wire substage_clk;
 	wire signed [7:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
@@ -52,7 +52,7 @@ module cic_decimator_tb;
 			.clk(clk), 
 			.enabled(enabled), 
 			.x(x), 
-			.clk_transfer(clk_transfer), 
+			.substage_clk(substage_clk), 
 			.y(y)
 	);
 

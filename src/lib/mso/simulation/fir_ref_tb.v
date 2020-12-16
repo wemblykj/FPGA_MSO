@@ -27,22 +27,25 @@ module fir_ref_tb;
 	// Inputs
 	reg rst_n;
 	reg clk;
-	reg [15:0] data_in;
-	wire [15:0] data_out;
+	reg [11:0] data_in;
+	wire [11:0] data_out;
 	reg [31:0] packed_coeffs;
 
 	// Instantiate the Unit Under Test (UUT)
 	fir_ref
-	# (.DATA_WIDTH(16),
+	# (
+		.INPUT_WIDTH(12),
+		.OUTPUT_WIDTH(16),
+		.PRECISION(16),
 		.COEFF_WIDTH(8),
-		.NUM_TAPS(4))
+		.N(4))
 		uut 
 	(
 		.rst_n(rst_n),
 		.clk(clk), 
-		.data_in(data_in), 
-		.data_out(data_out), 
-		.packed_coeff(packed_coeffs)
+		.x(data_in), 
+		.y(data_out), 
+		.packed_coeffs(packed_coeffs)
 	);
 
 	initial begin
