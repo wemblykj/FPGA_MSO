@@ -22,6 +22,7 @@
   <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="mso.xise"/>
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="cic_comb_tb_isim_beh.exe"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="cic_decimator_isim_beh.exe"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="cic_decimator_tb_isim_beh.exe"/>
@@ -35,7 +36,14 @@
     <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="isim"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_CMD" xil_pn:name="isim.cmd"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_LOG" xil_pn:name="isim.log"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="mso.prj"/>
+    <file xil_pn:fileType="FILE_XST_STX" xil_pn:name="mso.stx"/>
+    <file xil_pn:fileType="FILE_XST" xil_pn:name="mso.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="trigger_hub_tb_beh.prj"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="trigger_hub_tb_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="trigger_hub_tb_isim_beh.wdb"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_INI" xil_pn:name="xilinxsim.ini"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xst"/>
   </files>
 
   <transforms xmlns="http://www.xilinx.com/XMLSchema">
@@ -43,64 +51,48 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1608162475" xil_pn:in_ck="-2434058089410632138" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1608162475">
+    <transform xil_pn:end_ts="1608213525" xil_pn:in_ck="4566884284946106478" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1608213524">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_comb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_decimator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_integrator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/decimator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/downsampler.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/fir_alt.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/fir_ref.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/width_convertor.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_comb_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_decimator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_integrator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/decimator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/fir_alt_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/fir_ref_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_comb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_decimator.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_integrator.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/fir_ref.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_comb_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_decimator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_integrator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/fir_alt_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/fir_ref_tb.v"/>
+      <outfile xil_pn:name="../../../lib/common/rtl/width_convertor.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/analogue_signal_acquisition.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/analogue_signal_generation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/decimator.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/downsampler.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_decimation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_signal_acquisition.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_signal_generation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/mso.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/trigger_hub.v"/>
+      <outfile xil_pn:name="../../../lib/mso/simulation/analogue/decimator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/mso/simulation/trigger_hub_tb.v"/>
     </transform>
-    <transform xil_pn:end_ts="1608162475" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="8346200958997030404" xil_pn:start_ts="1608162475">
+    <transform xil_pn:end_ts="1608213313" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-486181486300388322" xil_pn:start_ts="1608213313">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1608162475" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="1213258864048768450" xil_pn:start_ts="1608162475">
+    <transform xil_pn:end_ts="1608213313" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="3348876829245847516" xil_pn:start_ts="1608213313">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1608162475" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="6628040929450246014" xil_pn:start_ts="1608162475">
+    <transform xil_pn:end_ts="1608213313" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="3626748250944315989" xil_pn:start_ts="1608213313">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1608162475" xil_pn:in_ck="-2434058089410632138" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1608162475">
-      <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
-      <status xil_pn:value="OutOfDateForOutputs"/>
-      <status xil_pn:value="InputChanged"/>
-      <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_comb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_decimator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/cic_integrator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/decimator.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/downsampler.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/fir_alt.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/fir_ref.v"/>
-      <outfile xil_pn:name="../../../lib/mso/rtl/width_convertor.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_comb_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_decimator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/cic_integrator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/decimator_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/fir_alt_tb.v"/>
-      <outfile xil_pn:name="../../../lib/mso/simulation/fir_ref_tb.v"/>
-    </transform>
-    <transform xil_pn:end_ts="1608162477" xil_pn:in_ck="-2434058089410632138" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-6074408048858476121" xil_pn:start_ts="1608162475">
+    <transform xil_pn:end_ts="1608213525" xil_pn:in_ck="4566884284946106478" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1608213525">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
@@ -108,22 +100,52 @@
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="decimator_tb_beh.prj"/>
-      <outfile xil_pn:name="decimator_tb_isim_beh.exe"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_comb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_decimator.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/cic_integrator.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/rtl/fir_ref.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_comb_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_decimator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/cic_integrator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/fir_alt_tb.v"/>
+      <outfile xil_pn:name="../../../lib/analogue/simulation/fir_ref_tb.v"/>
+      <outfile xil_pn:name="../../../lib/common/rtl/width_convertor.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/analogue_signal_acquisition.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/analogue_signal_generation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/decimator.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/analogue/downsampler.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_decimation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_signal_acquisition.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/digital/digital_signal_generation.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/mso.v"/>
+      <outfile xil_pn:name="../../../lib/mso/rtl/trigger_hub.v"/>
+      <outfile xil_pn:name="../../../lib/mso/simulation/analogue/decimator_tb.v"/>
+      <outfile xil_pn:name="../../../lib/mso/simulation/trigger_hub_tb.v"/>
+    </transform>
+    <transform xil_pn:end_ts="1608213526" xil_pn:in_ck="4566884284946106478" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="8047770774387794907" xil_pn:start_ts="1608213525">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="isim.log"/>
+      <outfile xil_pn:name="trigger_hub_tb_beh.prj"/>
+      <outfile xil_pn:name="trigger_hub_tb_isim_beh.exe"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1608162477" xil_pn:in_ck="-1033531381168316475" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-6540255390713728182" xil_pn:start_ts="1608162477">
+    <transform xil_pn:end_ts="1608213527" xil_pn:in_ck="-9172397598956050811" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-1816294985172691586" xil_pn:start_ts="1608213526">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="decimator_tb_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
       <outfile xil_pn:name="isim.log"/>
+      <outfile xil_pn:name="trigger_hub_tb_isim_beh.wdb"/>
     </transform>
   </transforms>
 

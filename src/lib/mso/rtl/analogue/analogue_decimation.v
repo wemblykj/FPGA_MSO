@@ -4,8 +4,8 @@
 // Engineer:       Paul Wightmore
 // 
 // Create Date:    14:55:50 12/13/2020  
-// Design Name:    decimator
-// Module Name:    decimator.v 
+// Design Name:    analogue_decimation
+// Module Name:    analogue_decimation.v 
 // Project Name:   FPGA Mixed Signal Oscilloscope
 // Target Devices: 
 // Tool versions: 
@@ -23,7 +23,7 @@
 // License:        https://www.apache.org/licenses/LICENSE-2.0
 //
 //////////////////////////////////////////////////////////////////////////////////
-module decimator
+module analogue_decimation
 	#(
 		// characteristics
 		parameter M = 2,						// decimation factor - default 2 (factor of 2)
