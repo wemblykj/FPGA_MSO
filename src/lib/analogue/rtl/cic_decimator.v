@@ -44,7 +44,7 @@ module cic_decimator
 
 	reg [$clog2(R+1):0] decimation_counter;
 	
-	always @(posedge clk or rst_n) begin
+	always @(posedge clk or negedge rst_n) begin
 		if (!rst_n) begin
 			decimation_counter = 0;
 			substage_clk = 0;

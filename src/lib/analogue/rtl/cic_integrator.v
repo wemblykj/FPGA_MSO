@@ -40,7 +40,7 @@ module cic_integrator
 
 	reg [PRECISION-1:0] z;
 	
-	always @(posedge clk or rst_n) begin
+	always @(posedge clk or negedge rst_n) begin
 		if (!rst_n) begin
 			z <= 0;
 		end else begin

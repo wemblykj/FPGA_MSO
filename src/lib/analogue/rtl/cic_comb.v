@@ -43,7 +43,7 @@ module cic_comb
 	
 	integer i;
 	
-	always @(posedge clk or rst_n) begin
+	always @(posedge clk or negedge rst_n) begin
 		if (!rst_n) begin
 			for (i = 0; i < D; i = i + 1) begin
 				z[i] <= 0;
