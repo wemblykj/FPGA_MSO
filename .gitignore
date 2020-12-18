@@ -82,3 +82,7 @@ webtalk_pn.xml
 **/_xmsgs/
 **/__xps/
 **/synthesis/
+*.onetoc2
+/src/platform/xilinx/mso/*.cmd
+/src/lib/mso/rtl/*.log
+/src/platform/xilinx/mso/*.xmsgs

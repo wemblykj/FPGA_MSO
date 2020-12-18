@@ -61,8 +61,6 @@ module fir_ref
 			.out(y) );
 				
 	genvar t;
-	genvar a_msb;
-	genvar a_lsb;
 	generate
 		for (t = 0; t < N ; t = t + 1) begin : for_taps
 			assign h[t] = packed_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];

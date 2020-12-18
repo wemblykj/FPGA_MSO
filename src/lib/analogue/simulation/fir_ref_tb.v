@@ -32,15 +32,13 @@ module fir_ref_tb;
 	reg [31:0] packed_coeffs;
 
 	// Instantiate the Unit Under Test (UUT)
-	fir_ref
-	# (
+	fir_ref #(
+		.N(4),
 		.INPUT_WIDTH(12),
 		.OUTPUT_WIDTH(16),
 		.PRECISION(16),
-		.COEFF_WIDTH(8),
-		.N(4))
-		uut 
-	(
+		.COEFF_WIDTH(8) )
+	uut (
 		.rst_n(rst_n),
 		.clk(clk), 
 		.x(data_in), 
