@@ -29,12 +29,37 @@ module iir_ff
 		parameter PRECISION = 16				// internal vertical precision
 	)
 	(
-		input rst_n,												// reset
-		input clk,													// clock
-		input signed [PRECISION-1:0] x,							// input
-		input signed b,											// stage coefficient
-		output [PRECISION-1:0] y									// output
+		input rst_n,								// reset
+		input clk,									// clock
+		input signed [PRECISION-1:0] x,		// input
+		input [(COEFF_WIDTH*N)-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
+		output [PRECISION-1:0] y				// output
     );
 
-
+	reg signed[PRECISION-1:0] x_1 [0:N-1];					// input delay line
+	wire signed[PRECISION-1:0] d [0:N-1];					// feed forward accumulator
+	wire signed [COEFF_WIDTH-1:0] b [0:N-1];				// unpacked b (feed forward) coefficients
+	
+	assign y = d[N-1];
+	
+	genvar t;
+	generate
+		for (t = 0; t < N ; t = t + 1) begin : for_stage
+			assign b[t] = packed_b_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
+			if (t == 0) begin : sum_initial
+				assign d[t] = x_1[t] * b[t];
+			end else begin : sum_cascade
+				assign d[t] = d[t-1] + (x_1[t] * b[t]);
+			end
+		end
+	endgenerate
+	
+	always @(posedge clk or negedge rst_n) begin
+		if (!rst_n) begin
+			x_1 <= 0;
+		end else begin
+			x_1 <= x;
+		end
+	end
+	
 endmodule

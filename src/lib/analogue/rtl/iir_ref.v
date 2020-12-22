@@ -44,16 +44,17 @@ module iir_ref
     );
 
 	localparam N = M+1;											// number of feed forward stages (order M plus 1)
-	reg signed[PRECISION-1:0] z [0:N-1];					// delay line
+	
+	reg signed[PRECISION-1:0] x_1 [0:N-1];					// input delay line
 	wire signed[PRECISION-1:0] d [0:N-1];					// feed forward accumulator
+	wire signed [COEFF_WIDTH-1:0] b [0:N-1];				// unpacked b (feed forward) coefficients
+	
+	reg signed[PRECISION-1:0] y_1 [0:M-1];					// output delay line
 	wire signed[PRECISION-1:0] m [0:M-1];					// feedback accumulator
 	wire signed [COEFF_WIDTH-1:0] a [0:M-1];				// unpacked a (feedback) coefficients
-	wire signed [COEFF_WIDTH-1:0] b [0:N-1];				// unpacked b (feed forward) coefficients
 	
 	wire signed [PRECISION-1:0] _x;							// preconditioned input
 	wire signed [PRECISION-1:0] _y;							// preconditioned output
-	
-	assign _y = m[N-1];
 	
 	// input conditioning
 	width_convertor #( .INPUT_WIDTH(X_WIDTH), .OUTPUT_WIDTH(PRECISION) )
@@ -70,45 +71,53 @@ module iir_ref
 	genvar t;
 	generate
 	
-		if (N > 0) begin : if_use_feed_forward
-			assign d[0] = _x;						// input goes to feed forward stage
-			assign _y = d[N-1] + m[M-1];		// feed forward accumulator goes to feedback stage
+		/*if (N > 0) begin : if_use_feed_forward
+			assign x_1[0] = _x;						// input goes to feed forward stage
+			//assign y_1[0] = y_1[N-1] + m[M-1];	// feed forward accumulator goes to feedback stage
 		end else begin : feedback_only
-			assign _y = _x + m[N-1];			// input goes direct to feedback stage
-		end
+			assign y_1[0] = _x + m[N-1];			// input goes direct to feedback stage
+		end*/
 		
 		for (t = 0; t < N ; t = t + 1) begin : for_feed_forward_stage
 			assign b[t] = packed_b_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
 			if (t == 0) begin : sum_initial
-				assign d[t] = z[t] * b[t];
+				assign d[t] = x_1[t] * b[t];
 			end else begin : sum_cascade
-				assign d[t] = d[t-1] + (z[t] * b[t]);
+				assign d[t] = d[t-1] + (x_1[t] * b[t]);
 			end
 		end
 	
 		for (t = 0; t < M ; t = t + 1) begin : for_feedback_stage
 			assign a[t] = packed_a_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
 			if (t == 0) begin : sum_initial
-				assign m[t] = z[t] * h[t];
+				assign m[t] = y_1[t] * a[t];
 			end else begin : sum_cascade
-				assign m[t] = m[t-1] + (z[t] * a[t]);
+				assign m[t] = m[t-1] + (y_1[t] * a[t]);
 			end
 		end
 	endgenerate
+	
+	assign _y = d[N-1] + m[M-1];
 	
 	integer i;
 	always @(posedge clk or rst_n) begin
 		if (!rst_n) begin
 			for (i = 0; i < N ; i = i + 1) begin : ff_delay_line_reset
-				z[i] <= 0;
+				x_1[i] <= 0;
 			end
 			for (i = 0; i < M ; i = i + 1) begin : fb_delay_line_reset
-				z[i] <= 0;
+				y_1[i] <= 0;
 			end
 		end else begin
-			z[0] <= _x;
-			for (i = 1; i < N ; i = i + 1) begin : delay_line_cascade
-				z[i] <= z[i-1];
+			y_1[0] <= _y;
+			x_1[0] <= _x;
+			
+			for (i = 1; i < N ; i = i + 1) begin : ff_delay_line_cascade
+				x_1[i] <= x_1[i-1];
+			end
+			
+			for (i = 1; i < N ; i = i + 1) begin : fb_delay_line_cascade
+				y_1[i] <= y_1[i-1];
 			end
 		end
 	end
