@@ -4,15 +4,15 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   13:32:54 12/21/2020
-// Design Name:   iir_ff
-// Module Name:   /home/administrator/Development/fpga/FPGA_MSO/src/lib/analogue/simulation/iir_ff_tb.v
+// Create Date:   22:22:13 01/04/2021
+// Design Name:   iir_df_i
+// Module Name:   C:/Development/FPGA/FPGA_MSO/src/lib/analogue/simulation/iir_df_i_tb.v
 // Project Name:  mso
 // Target Device:  
 // Tool versions:  
 // Description: 
 //
-// Verilog Test Fixture created by ISE for module: iir_ff
+// Verilog Test Fixture created by ISE for module: iir_df_i
 //
 // Dependencies:
 // 
@@ -22,29 +22,31 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module iir_ff_tb;
+module iir_df_i_tb;
 
 	// Inputs
 	reg rst_n;
 	reg clk;
-	reg [15:0] x;
-	
+	reg [11:0] x;
+	reg [15:0] packed_a_coeffs;
+	reg [23:0] packed_b_coeffs;
+
 	// Outputs
-	wire [15:0] y;
+	wire [11:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
-	iir_ff 
-		#(
-			.N(2),
-			.PRECISION(16),
-			.COEFF_WIDTH(14),
-			.Q(2)
-		)
-		uut (
+	iir_df_i #(
+		.M(2),					// 2nd-order
+		.INPUT_WIDTH(12),
+		.OUTPUT_WIDTH(16),
+		.PRECISION(16), 
+		.COEFF_WIDTH(14) )
+	uut (
 		.rst_n(rst_n), 
 		.clk(clk), 
 		.x(x), 
-		.packed_b_coeffs({ 14'd8, -14'd12 }), 
+		.packed_a_coeffs(packed_a_coeffs), 
+		.packed_b_coeffs(packed_b_coeffs), 
 		.y(y)
 	);
 
@@ -53,21 +55,15 @@ module iir_ff_tb;
 		rst_n = 0;
 		clk = 0;
 		x = 0;
-		
+		packed_a_coeffs = 0;
+		packed_b_coeffs = 0;
+
 		// Wait 100 ns for global reset to finish
 		#100;
-      rst_n = 1; #10;
-		
+        
 		// Add stimulus here
-		#10;
-		x = 1; #10; 
-		x = 0; #20; 
-		
-      $finish;
-		
+
 	end
       
-	always #5 clk = ~clk;
-	
 endmodule
 

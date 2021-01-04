@@ -4,15 +4,15 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   13:32:54 12/21/2020
-// Design Name:   iir_ff
-// Module Name:   /home/administrator/Development/fpga/FPGA_MSO/src/lib/analogue/simulation/iir_ff_tb.v
+// Create Date:   22:25:25 12/22/2020
+// Design Name:   iir_fb
+// Module Name:   C:/Development/FPGA/FPGA_MSO/src/lib/mso/simulation/iir_fb_tb.v
 // Project Name:  mso
 // Target Device:  
 // Tool versions:  
 // Description: 
 //
-// Verilog Test Fixture created by ISE for module: iir_ff
+// Verilog Test Fixture created by ISE for module: iir_fb
 //
 // Dependencies:
 // 
@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module iir_ff_tb;
+module iir_fb_tb;
 
 	// Inputs
 	reg rst_n;
@@ -31,20 +31,20 @@ module iir_ff_tb;
 	
 	// Outputs
 	wire [15:0] y;
-
+	
 	// Instantiate the Unit Under Test (UUT)
-	iir_ff 
+	iir_fb 
 		#(
-			.N(2),
+			.M(1),
 			.PRECISION(16),
 			.COEFF_WIDTH(14),
-			.Q(2)
+			.Q(12)
 		)
 		uut (
 		.rst_n(rst_n), 
 		.clk(clk), 
 		.x(x), 
-		.packed_b_coeffs({ 14'd8, -14'd12 }), 
+		.packed_a_coeffs({ -2048 }), 
 		.y(y)
 	);
 
@@ -56,18 +56,19 @@ module iir_ff_tb;
 		
 		// Wait 100 ns for global reset to finish
 		#100;
-      rst_n = 1; #10;
-		
+		rst_n = 1;
+        
 		// Add stimulus here
 		#10;
-		x = 1; #10; 
-		x = 0; #20; 
+		x = -3; #10; 
+		x = 2; #10; 
+		x = 0; #100; 
 		
       $finish;
 		
 	end
       
 	always #5 clk = ~clk;
-	
+      
 endmodule
 

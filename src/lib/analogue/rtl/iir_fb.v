@@ -25,40 +25,49 @@
 //////////////////////////////////////////////////////////////////////////////////
 module iir_fb
 	#(
+		// characteristics
+		parameter M = 2,
 		// precision
-		parameter PRECISION = 16				// internal vertical precision
+		parameter PRECISION = 24,				// internal vertical precision
+		parameter COEFF_WIDTH = 16				// coefficient precision
 	)
 	(
 		input rst_n,								// reset
 		input clk,									// clock
 		input signed [PRECISION-1:0] x,		// input
-		input [(COEFF_WIDTH*N)-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
-		output [PRECISION-1:0] y				// output
+		input [(COEFF_WIDTH*M)-1:0] packed_a_coeffs,	// packed a (feedback) coefficients
+		output signed [PRECISION-1:0] y				// output
     );
-
-	reg signed[PRECISION-1:0] x_1 [0:N-1];					// input delay line
-	wire signed[PRECISION-1:0] d [0:N-1];					// feed forward accumulator
-	wire signed [COEFF_WIDTH-1:0] b [0:N-1];				// unpacked b (feed forward) coefficients
+	 
+	reg signed[PRECISION-1:0] y_1 [0:M-1];					// output delay line
+	wire signed[PRECISION-1:0] d [0:M-1];					// feedback accumulator
+	wire signed [COEFF_WIDTH-1:0] neg_a [0:M-1];			// unpacked -a (feedback) coefficients
 	
-	assign y = d[M-1];
+	assign y = x + d[M-1];
 	
 	genvar t;
 	generate
-		for (t = 0; t < N ; t = t + 1) begin : for_stage
-			assign b[t] = packed_b_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
+		for (t = 0; t < M ; t = t + 1) begin : for_stage
+			assign neg_a[t] = -packed_a_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
 			if (t == 0) begin : sum_initial
-				assign d[t] = x_1[t] * b[t];
+				assign d[t] = y_1[t] * neg_a[t];
 			end else begin : sum_cascade
-				assign d[t] = d[t-1] + (x_1[t] * b[t]);
+				assign d[t] = d[t-1] + (y_1[t] * neg_a[t]);
 			end
 		end
 	endgenerate
 	
+	integer i;
 	always @(posedge clk or negedge rst_n) begin
 		if (!rst_n) begin
-			x_1 <= 0;
+			for (i = 0; i < M ; i = i + 1) begin
+				y_1[i] <= 0;
+			end
 		end else begin
-			x_1 <= x;
+			for (i = 1; i < M ; i = i + 1) begin
+				y_1[i] <= y_1[i-1];
+			end
+			y_1[0] <= y;
 		end
 	end
 	

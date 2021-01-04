@@ -36,8 +36,9 @@ module fir_ref_tb;
 		.N(4),
 		.INPUT_WIDTH(12),
 		.OUTPUT_WIDTH(16),
-		.PRECISION(16),
-		.COEFF_WIDTH(8) )
+		.PRECISION(24),
+		.COEFF_WIDTH(16),
+		.Q(14))
 	uut (
 		.rst_n(rst_n),
 		.clk(clk), 

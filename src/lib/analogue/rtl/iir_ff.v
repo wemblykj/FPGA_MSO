@@ -25,23 +25,28 @@
 //////////////////////////////////////////////////////////////////////////////////
 module iir_ff
 	#(
+		// characteristics
+		parameter N = 3,
 		// precision
-		parameter PRECISION = 16				// internal vertical precision
+		parameter PRECISION = 16,				// internal vertical precision
+		parameter COEFF_WIDTH = 8,				// vertical precision
+		parameter Q = 1
 	)
 	(
 		input rst_n,								// reset
 		input clk,									// clock
 		input signed [PRECISION-1:0] x,		// input
-		input [(COEFF_WIDTH*N)-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
-		output [PRECISION-1:0] y				// output
+		input signed [(COEFF_WIDTH*N)-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
+		output signed [PRECISION-1:0] y				// output
     );
 
 	reg signed[PRECISION-1:0] x_1 [0:N-1];					// input delay line
 	wire signed[PRECISION-1:0] d [0:N-1];					// feed forward accumulator
 	wire signed [COEFF_WIDTH-1:0] b [0:N-1];				// unpacked b (feed forward) coefficients
 	
-	assign y = d[N-1];
-	
+	//assign y = {{Q{d[N-1][PRECISION-Q]}}, {d[N-1][PRECISION-Q-1:Q]}};
+	assign y = {{Q{d[N-1][PRECISION-Q]}}, {d[N-1][PRECISION-Q-1:Q]}};
+			
 	genvar t;
 	generate
 		for (t = 0; t < N ; t = t + 1) begin : for_stage
@@ -54,11 +59,17 @@ module iir_ff
 		end
 	endgenerate
 	
+	integer i;
 	always @(posedge clk or negedge rst_n) begin
 		if (!rst_n) begin
-			x_1 <= 0;
+			for (i = 0; i < N ; i = i + 1) begin
+				x_1[i] <= 0;
+			end
 		end else begin
-			x_1 <= x;
+			for (i = 1; i < N ; i = i + 1) begin
+				x_1[i] <= x_1[i-1];
+			end
+			x_1[0] <= x;
 		end
 	end
 	

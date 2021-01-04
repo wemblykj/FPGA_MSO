@@ -5,8 +5,8 @@
 // Engineer:
 //
 // Create Date:   21:42:43 12/16/2020
-// Design Name:   decimator
-// Module Name:   C:/Users/paulw/Development/FPGA/FPGA_MSO/src/lib/mso/simulation/deimator_tb.v
+// Design Name:   analogue_decimation
+// Module Name:   C:/Users/paulw/Development/FPGA/FPGA_MSO/src/lib/mso/simulation/analogue_decimation_tb.v
 // Project Name:  mso
 // Target Device:  
 // Tool versions:  
@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module decimator_tb;
+module analogue_decimation_tb;
 
 	// Inputs
 	reg rst_n;
@@ -33,7 +33,7 @@ module decimator_tb;
 	wire [7:0] data_out;
 
 	// Instantiate the Unit Under Test (UUT)
-	decimator 
+	analogue_decimation 
 		#(
 			.X_WIDTH(8),	// test input trimming
 			.Y_WIDTH(12), 	// test ouput padding
