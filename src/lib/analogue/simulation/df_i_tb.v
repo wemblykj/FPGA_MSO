@@ -12,7 +12,7 @@
 // Tool versions:  
 // Description: 
 //
-// Verilog Test Fixture created by ISE for module: iir_ff
+// Verilog Test Fixture created by ISE for module: df_i
 //
 // Dependencies:
 // 
@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module iir_ff_tb;
+module df_i_tb;
 
 	// Inputs
 	reg rst_n;
@@ -33,18 +33,18 @@ module iir_ff_tb;
 	wire [15:0] y;
 
 	// Instantiate the Unit Under Test (UUT)
-	iir_ff 
+	df_i 
 		#(
-			.N(2),
+			.N(1),
 			.PRECISION(16),
-			.COEFF_WIDTH(14),
+			.COEFF_WIDTH(4),
 			.Q(2)
 		)
 		uut (
 		.rst_n(rst_n), 
 		.clk(clk), 
 		.x(x), 
-		.packed_b_coeffs({ 14'd8, -14'd12 }), 
+		.packed_coeffs({ 4'd8, -4'd12 }), 
 		.y(y)
 	);
 

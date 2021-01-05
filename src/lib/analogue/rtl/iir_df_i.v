@@ -31,7 +31,7 @@ module iir_df_i
 		// precision
 		parameter X_WIDTH = 12,					// input vertical precision
 		parameter Y_WIDTH = 12,					// ouput vertical precision
-		parameter PRECISION = 24,				// internal vertical precision
+		parameter PRECISION = 16,				// internal vertical precision
 		parameter COEFF_WIDTH = 16,			// coefficient precision
 		parameter Q = 14							// coefficient scale factor index (2^Q)
 	)
@@ -39,56 +39,48 @@ module iir_df_i
 		 input rst_n,												// reset
 		 input clk,													// clock
 		 input signed [X_WIDTH-1:0] x,						// input
-		 input [(COEFF_WIDTH*M)-1:0] packed_a_coeffs,	// packed a (feedback) coefficients
-		 input [(COEFF_WIDTH*(M+1))-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
+		 input [(COEFF_WIDTH*N)-1:0] packed_a_coeffs,	// packed a (feedback) coefficients
+		 input [(COEFF_WIDTH*(N+1))-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
 		 output signed [Y_WIDTH-1:0] y									// output
     );
 	
-	//wire signed [PRECISION-1:0] _x;							// preconditioned input
-	wire signed [PRECISION-1:0] _y;							// pre-scaled output
+	wire signed [COEFF_WIDTH-1:0] a0 = {{COEFF_WIDTH}{2^Q}};					// a0 = 1 * 2^Q
 	
 	wire signed [PRECISION-1:0] d;							// intermediate results
 	
-	// input conditioning
-	/*width_convertor #( .INPUT_WIDTH(X_WIDTH), .OUTPUT_WIDTH(PRECISION) )
-		input_width_convertor (
-			.in(x),
-			.out(_x)	);*/
-	
-	// output conditioning
-	/*width_convertor #( .INPUT_WIDTH(PRECISION), .OUTPUT_WIDTH(Y_WIDTH) )
-		output_width_convertor (
-			.in(_y),
-			.out(y) );*/
-
-	assign y = _y >> Q;
-	
-	iir_ff #(
-			.N(N+1),
+	df_i #(
+			.N(N),
+			.X_WIDTH(X_WIDTH),
+			.Y_WIDTH(PRECISION),
 			.PRECISION(PRECISION),
-			.COEFF_WIDTH(COEFF_WIDTH)
+			.COEFF_WIDTH(COEFF_WIDTH),
+			.Q(1)
 		)
 		ff
 		(
 			.rst_n(rst_n),
 			.clk(clk),
-			.x(_x),
-			.packed_b_coeffs(packed_b_coeffs),
+			.x(x),
+			.packed_coeffs(packed_b_coeffs),
 			.y(d)
 		);
 		
-		iir_fb #(
-			.M(N),
+		df_i #(
+			.N(N),
+			.X_WIDTH(PRECISION),
+			.Y_WIDTH(Y_WIDTH),
 			.PRECISION(PRECISION),
-			.COEFF_WIDTH(COEFF_WIDTH)
+			.COEFF_WIDTH(COEFF_WIDTH),
+			.Q(Q),
+			.F(-1)
 		)
 		fb
 		(
 			.rst_n(rst_n),
 			.clk(clk),
 			.x(d),
-			.packed_a_coeffs(packed_a_coeffs),
-			.y(_y)
+			.packed_coeffs( { packed_a_coeffs, a0 } ),
+			.y(y)
 		);
 
 endmodule

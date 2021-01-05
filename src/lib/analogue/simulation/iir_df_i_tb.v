@@ -28,8 +28,8 @@ module iir_df_i_tb;
 	reg rst_n;
 	reg clk;
 	reg [11:0] x;
-	reg [15:0] packed_a_coeffs;
-	reg [23:0] packed_b_coeffs;
+	reg [31:0] packed_a_coeffs;
+	reg [47:0] packed_b_coeffs;
 
 	// Outputs
 	wire [11:0] y;
@@ -40,7 +40,8 @@ module iir_df_i_tb;
 		.INPUT_WIDTH(12),
 		.OUTPUT_WIDTH(16),
 		.PRECISION(16), 
-		.COEFF_WIDTH(14) )
+		.COEFF_WIDTH(16),
+		.Q(14))
 	uut (
 		.rst_n(rst_n), 
 		.clk(clk), 

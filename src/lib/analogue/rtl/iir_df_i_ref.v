@@ -91,7 +91,7 @@ module iir_df_i_ref
 	endgenerate
 	
 	assign _y = d[N] + m[N-1];
-	assign y = _y >> Q;
+	assign y = { {(PRECISION-Q){_y[PRECISION-1]}}, _y[PRECISION-Q:Q] };
 	
 	integer i;
 	always @(posedge clk or rst_n) begin
