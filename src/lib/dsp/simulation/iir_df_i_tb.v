@@ -34,6 +34,17 @@ module iir_df_i_tb;
 	// Outputs
 	wire [11:0] y;
 
+	localparam real freq = 50;
+	localparam real scale = 2^q;
+	localparam real scale_2 = scale / 2.0;
+	localparam real sample_rate = 5.0;
+	localparam real sample_rate_2 = sample_rate / 2.0;
+	localparam real pi = 3.14159;
+	localparam real w = 2.0 * pi * freq / sample_rate;
+	//real a0 = sin(w) * scale_2;
+	localparam real a1 = 2.0 * $cos(w) * scale;
+	localparam real a2 = -scale;
+	
 	// Instantiate the Unit Under Test (UUT)
 	iir_df_i #(
 		.M(2),					// 2nd-order
