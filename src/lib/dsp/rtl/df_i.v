@@ -29,8 +29,7 @@ module df_i
 		parameter Y_WIDTH = 12,					// ouput vertical precision
 		parameter PRECISION = 16,				// internal vertical precision
 		parameter COEFF_WIDTH = 16,			// precision
-		parameter Q = 14,							// coefficient scale factor index (2^Q)
-		parameter F = 1							// additional coefficient scale factor (used primarily for negation)
+		parameter Q = 14							// coefficient scale factor index (2^Q)
 	)
 	(
 		input rst_n,															// reset
@@ -46,12 +45,12 @@ module df_i
 	wire signed [PRECISION-1:0] _y;							// pre-scaled output	
 	
 	assign _y = d[N];
-	assign y = { {(PRECISION-Q){_y[PRECISION-1]}}, _y[PRECISION-Q:Q] };
+	assign y = { {(Q){_y[PRECISION-1]}}, _y[PRECISION-1:Q] };
 			
 	genvar t;
 	generate
 		for (t = 0; t < (N+1) ; t = t + 1) begin : for_stage
-			assign h[t] = F * packed_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
+			assign h[t] = packed_coeffs[((COEFF_WIDTH*t)+COEFF_WIDTH)-1:COEFF_WIDTH*t];
 			if (t == 0) begin : sum_initial
 				assign d[t] = z[t] * h[t];
 			end else begin : sum_cascade

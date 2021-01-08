@@ -28,22 +28,19 @@ module iir_df_i_tb;
 	reg rst_n;
 	reg clk;
 	reg [11:0] x;
-	reg [31:0] packed_a_coeffs;
-	reg [47:0] packed_b_coeffs;
-
+	
 	// Outputs
 	wire [11:0] y;
-
-	localparam real freq = 50;
-	localparam real scale = 2^q;
-	localparam real scale_2 = scale / 2.0;
-	localparam real sample_rate = 5.0;
-	localparam real sample_rate_2 = sample_rate / 2.0;
-	localparam real pi = 3.14159;
-	localparam real w = 2.0 * pi * freq / sample_rate;
-	//real a0 = sin(w) * scale_2;
-	localparam real a1 = 2.0 * $cos(w) * scale;
-	localparam real a2 = -scale;
+	
+	localparam integer cw = 16;
+	localparam integer q = 14;
+	localparam integer scale = 2**q;
+	
+	localparam [cw-1:0] b0 = 1 * scale;
+	localparam [cw-1:0] b1 = 0.0 * scale;
+	localparam [cw-1:0] b2 = -1.0 * scale;
+	localparam [cw-1:0] a1_n = 0.0 * scale;
+	localparam [cw-1:0] a2_n = -0.50952544994652271 * scale;
 	
 	// Instantiate the Unit Under Test (UUT)
 	iir_df_i #(
@@ -51,14 +48,14 @@ module iir_df_i_tb;
 		.INPUT_WIDTH(12),
 		.OUTPUT_WIDTH(16),
 		.PRECISION(16), 
-		.COEFF_WIDTH(16),
-		.Q(14))
+		.COEFF_WIDTH(cw),
+		.Q(q))
 	uut (
 		.rst_n(rst_n), 
 		.clk(clk), 
 		.x(x), 
-		.packed_a_coeffs(packed_a_coeffs), 
-		.packed_b_coeffs(packed_b_coeffs), 
+		.packed_a_coeffs( { a2_n, a1_n } ), 
+		.packed_b_coeffs( { b2, b1, b0 } ), 
 		.y(y)
 	);
 
@@ -67,15 +64,20 @@ module iir_df_i_tb;
 		rst_n = 0;
 		clk = 0;
 		x = 0;
-		packed_a_coeffs = 0;
-		packed_b_coeffs = 0;
-
+		
 		// Wait 100 ns for global reset to finish
 		#100;
+		rst_n = 1;
         
 		// Add stimulus here
-
+		#10;
+		x = 1; #10;
+		x = 0; #100;
+		
+		$finish;
 	end
+   
+	always #5 clk = ~clk;
       
 endmodule
 
