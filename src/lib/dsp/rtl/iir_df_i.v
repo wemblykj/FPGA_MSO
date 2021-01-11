@@ -44,7 +44,7 @@ module iir_df_i
 		 output signed [Y_WIDTH-1:0] y							// output
     );
 	
-	wire signed [COEFF_WIDTH-1:0] a0 = {{COEFF_WIDTH}{2^Q}};					// a0 = 1 * 2^Q
+	wire signed [COEFF_WIDTH-1:0] a0 = 1; // {{COEFF_WIDTH}{2**Q}};					// a0 = 1 * 2^Q
 	
 	wire signed [PRECISION-1:0] d;							// intermediate results
 	
@@ -54,7 +54,8 @@ module iir_df_i
 			.Y_WIDTH(PRECISION),
 			.PRECISION(PRECISION),
 			.COEFF_WIDTH(COEFF_WIDTH),
-			.Q(1)
+			//.Q(Q)	// required if a0 = 1 * 2**Q
+			.Q(0)	// we can retain scaled up output when a0 = 1
 		)
 		ff
 		(

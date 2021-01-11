@@ -45,7 +45,7 @@ module df_i
 	wire signed [PRECISION-1:0] _y;							// pre-scaled output	
 	
 	assign _y = d[N];
-	assign y = { {(PRECISION-Q){_y[PRECISION-1]}}, _y[PRECISION-Q:Q] };
+	assign y = { {(Q){_y[PRECISION-1]}}, _y[PRECISION-1:Q] };
 			
 	genvar t;
 	generate
