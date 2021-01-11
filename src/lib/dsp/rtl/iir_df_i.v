@@ -36,12 +36,12 @@ module iir_df_i
 		parameter Q = 14							// coefficient scale factor index (2^Q)
 	)
 	(
-		 input rst_n,												// reset
-		 input clk,													// clock
-		 input signed [X_WIDTH-1:0] x,						// input
-		 input [(COEFF_WIDTH*N)-1:0] packed_a_coeffs,	// packed a (feedback) coefficients
+		 input rst_n,													// reset
+		 input clk,														// clock
+		 input signed [X_WIDTH-1:0] x,							// input
+		 input [(COEFF_WIDTH*N)-1:0] packed_a_coeffs,		// packed -a (feedback) coefficients
 		 input [(COEFF_WIDTH*(N+1))-1:0] packed_b_coeffs,	// packed b (feed forward) coefficients
-		 output signed [Y_WIDTH-1:0] y									// output
+		 output signed [Y_WIDTH-1:0] y							// output
     );
 	
 	wire signed [COEFF_WIDTH-1:0] a0 = {{COEFF_WIDTH}{2^Q}};					// a0 = 1 * 2^Q
@@ -71,8 +71,7 @@ module iir_df_i
 			.Y_WIDTH(Y_WIDTH),
 			.PRECISION(PRECISION),
 			.COEFF_WIDTH(COEFF_WIDTH),
-			.Q(Q),
-			.F(-1)
+			.Q(Q)
 		)
 		fb
 		(
